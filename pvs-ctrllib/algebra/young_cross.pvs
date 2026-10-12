@@ -1,0 +1,41 @@
+young_cross: THEORY
+BEGIN
+  C, lam, s, t, x: VAR real
+
+  square_nonneg: LEMMA FORALL x: 0 <= x*x
+%|- square_nonneg : PROOF (grind) QED
+
+  coeff_nonneg: LEMMA C >= 0 AND lam > 0 IMPLIES 0 <= C/(2*lam)
+%|- coeff_nonneg : PROOF (then (skosimp*) (lemma "pos_div_ge") (inst?) (grind)) QED
+%|- coeff_nonneg_TCC* : PROOF (grind) QED
+
+  scaled_square_nonneg: LEMMA
+    C >= 0 AND lam > 0 IMPLIES
+      0 <= C/(2*lam) * ((lam*s-t)*(lam*s-t))
+%|- scaled_square_nonneg : PROOF
+%|- (then (skosimp*)
+%|-   (lemma "coeff_nonneg" ("C" "C!1" "lam" "lam!1"))
+%|-   (lemma "square_nonneg" ("x" "lam!1*s!1-t!1"))
+%|-   (lemma "pos_times_ge"
+%|-      ("x" "C!1/(2*lam!1)"
+%|-       "y" "(lam!1*s!1-t!1)*(lam!1*s!1-t!1)"))
+%|-   (grind))
+%|- QED
+
+  square_identity: LEMMA C >= 0 AND lam > 0 IMPLIES
+    C/(2*lam) * ((lam*s-t)*(lam*s-t)) =
+      C*lam/2*(s*s) - C*s*t + C/(2*lam)*(t*t)
+%|- square_identity : PROOF (then (skosimp*) (field)) QED
+%|- square_identity_TCC* : PROOF (grind) QED
+  young_cross: THEOREM
+    C >= 0 AND lam > 0 IMPLIES
+      C*s*t <= C*lam/2*(s*s) + C/(2*lam)*(t*t)
+%|- young_cross : PROOF
+%|- (then (skosimp*)
+%|-   (lemma "scaled_square_nonneg"
+%|-      ("C" "C!1" "lam" "lam!1" "s" "s!1" "t" "t!1"))
+%|-   (lemma "square_identity"
+%|-      ("C" "C!1" "lam" "lam!1" "s" "s!1" "t" "t!1"))
+%|-   (grind))
+%|- QED
+END young_cross

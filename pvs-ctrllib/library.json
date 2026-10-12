@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "name": "PVS-Ctrllib",
+  "updated": "2026-09-19",
+  "scope": "Selected independent PVS reproofs and explicit Lean statement correspondences",
+  "runtime_baseline": {"pvs": "8.1", "sbcl": "2.6.8", "lean": "4.34.0", "mathlib": "4.34.0"},
+  "verification": {
+    "external_oracles": false,
+    "nasalib_imports": false,
+    "method": "Fresh isolated saved-proof replay, checking every formula and TCC for complete status",
+    "receipt": "evidence/replay.summary",
+    "formula_count_including_tccs": 18,
+    "trust": ["PVS prelude logic and arithmetic", "PVS proof procedures and implementation", "runtime implementation"],
+    "not_established": ["cross-prover certificate transport", "formal representation equivalence", "physical model correspondence"]
+  },
+  "theories": [
+    {
+      "source": "contracts/assume_guarantee.pvs",
+      "theory": "assume_guarantee",
+      "parameters": ["T", "U", "V", "W"],
+      "formulas": ["satisfies_sequential", "enabled_sequential"],
+      "correspondence": [
+        {"pvs": "satisfies_sequential", "lean": "Ctrllib.AssumeGuarantee.satisfies_sequential", "kind": "independent relational-contract reproof"},
+        {"pvs": "enabled_sequential", "lean": "Ctrllib.AssumeGuarantee.enabled_sequential", "kind": "independent output-existence reproof"}
+      ],
+      "boundary": "Abstract relational contracts with explicit wiring; reviewed statement mapping, no cross-prover type or quantifier translation theorem. No temporal, feedback or plant semantics."
+    },
+    {
+      "source": "arithmetic/two_rover_safety.pvs",
+      "theory": "two_rover_safety",
+      "formulas": ["absolute_error", "clearance_transfer", "current_clearance", "timing_transfer"],
+      "correspondence": [
+        {"pvs": "absolute_error", "lean": "Ctrllib.dist_actual_ge_dist_nominal_sub", "kind": "real-line specialization with explicit nonnegative error budgets"},
+        {"pvs": "clearance_transfer", "lean": "Ctrllib.dist_actual_ge_dist_nominal_sub", "kind": "real-line specialization plus separation lower bound"},
+        {"pvs": "current_clearance", "lean": "Ctrllib.rover_sampled_clearance_lower_bound", "kind": "narrower scalar arithmetic support; displacement bounds supplied"},
+        {"pvs": "timing_transfer", "lean": "Ctrllib.dist_delivered_to_target_on_le", "kind": "narrower scalar multiplication step; no signal or Lipschitz theorem"}
+      ],
+      "boundary": "Absolute distance on reals. Does not prove three-dimensional geometry, trajectory regularity, or delivery-to-motion bounds."
+    },
+    {
+      "source": "arithmetic/metric_clearance.pvs",
+      "theory": "metric_clearance",
+      "parameters": ["Point"],
+      "formulas": ["delivered_clearance", "motion_budget_clearance"],
+      "correspondence": [
+        {"pvs": "delivered_clearance", "lean": "Ctrllib.dist_actual_ge_dist_nominal_sub", "kind": "conditional abstract-distance adapter with explicit triangle and symmetry instances"},
+        {"pvs": "motion_budget_clearance", "lean": "Ctrllib.rover_sampled_clearance_lower_bound", "kind": "geometric/arithmetic consequence after pointwise motion bounds are supplied"}
+      ],
+      "boundary": "Distance is a real-valued function with the needed symmetry and triangle instances in theorem premises. No custom metric axioms and no Euclidean or Lipschitz instantiation."
+    },
+    {
+      "source": "arithmetic/pose_clearance.pvs",
+      "theory": "pose_clearance",
+      "formulas": ["pose_position_error", "pose_body_clearance", "clearance_budget_monotone", "clock_decomposition"],
+      "correspondence": [
+        {"pvs": "pose_position_error", "lean": "Ctrllib.rigid_point_error_le", "kind": "scalar budget arithmetic only; no operator or point representation"},
+        {"pvs": "pose_body_clearance", "lean": "Ctrllib.rover_pose_body_clearance", "kind": "real-line arithmetic support after point displacement and cover allowances are supplied; not the full geometric theorem"},
+        {"pvs": "clearance_budget_monotone", "lean": null, "kind": "scalar monotonicity of the composed lower bound; no dedicated Lean counterpart claimed"},
+        {"pvs": "clock_decomposition", "lean": "Ctrllib.timestamp_error_decomposition", "kind": "partial scalar analogue: two-segment time bound; Lean has three segments accounting for target-clock error separately"}
+      ],
+      "boundary": "The name theta denotes an arbitrary real scalar, not an angle-to-rotation theorem. No rigid geometry, time-signal or cover construction is encoded. Body radii, operator-difference allowances, point-motion and covering errors must be justified before applying the scalar budget."
+    },
+    {
+      "source": "algebra/young_cross.pvs",
+      "theory": "young_cross",
+      "formulas": ["square_nonneg", "coeff_nonneg_TCC1", "coeff_nonneg", "scaled_square_nonneg", "square_identity", "young_cross"],
+      "correspondence": [
+        {"pvs": "young_cross", "lean": "Ctrllib.young_cross", "kind": "independent reproof preserving C >= 0 and lambda > 0"}
+      ],
+      "boundary": "Promoted scalar pilot with a fresh package replay; five named claims and one generated TCC. PVS and Lean real foundations remain distinct."
+    }
+  ],
+  "external_prior_evidence": [],
+  "remaining": [
+    "Euclidean geometry and relative-pose-to-point adapters",
+    "PVS signal Lipschitz, timestamp and body-cover composition",
+    "Selected reference, forcing and storage contracts",
+    "Pinned NASALib-dependent weighted tier",
+    "Individually reviewed observer and population-risk ports"
+  ]
+}

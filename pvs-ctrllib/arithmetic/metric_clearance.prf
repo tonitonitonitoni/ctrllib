@@ -1,0 +1,8 @@
+(|metric_clearance|
+ (|delivered_clearance| 0
+  (|delivered_clearance-1| NIL 3998836923 ("" (THEN (SKOSIMP*) (GRIND)) NIL)
+   NIL SHOSTAK))
+ (|motion_budget_clearance| 0
+  (|motion_budget_clearance-1| NIL 3998836923
+   ("" (THEN (SKOSIMP*) (GRIND)) NIL) NIL SHOSTAK)))
+

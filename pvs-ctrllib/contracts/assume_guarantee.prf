@@ -1,0 +1,6 @@
+(|assume_guarantee|
+ (|satisfies_sequential| 0
+  (|satisfies_sequential-1| NIL 3998836495 ("" (GRIND) NIL) NIL SHOSTAK))
+ (|enabled_sequential| 0
+  (|enabled_sequential-1| NIL 3998836495 ("" (GRIND) NIL) NIL SHOSTAK)))
+

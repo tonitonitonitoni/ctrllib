@@ -1,0 +1,31 @@
+(|two_rover_safety|
+ (|absolute_error| 0
+  (|absolute_error-1| NIL 3998836500
+   (""
+    (THEN (SKOSIMP*) (LEMMA "triangle" ("x" "p0!1-p!1" "y" "p!1-q!1"))
+     (LEMMA "triangle" ("x" "p0!1-p!1+p!1-q!1" "y" "q!1-q0!1")) (GRIND))
+    NIL)
+   NIL SHOSTAK))
+ (|clearance_transfer| 0
+  (|clearance_transfer-1| NIL 3998836500
+   ("" (THEN (SKOSIMP*) (LEMMA "absolute_error") (GRIND)) NIL) NIL SHOSTAK))
+ (|current_clearance| 0
+  (|current_clearance-1| NIL 3998836716
+   (""
+    (THEN (SKOSIMP*)
+     (LEMMA "absolute_error" ("ep" "ep!1+Lp!1*h!1" "eq" "eq!1+Lq!1*h!1"))
+     (GRIND))
+    NIL)
+   NIL SHOSTAK))
+ (|timing_transfer| 0
+  (|timing_transfer-1| NIL 3998836500
+   (""
+    (THEN (SKOSIMP*)
+     (LEMMA "le_times_le_pos"
+      ("nnx" "L!1" "y" "L!1" "nnz" "abs(timing!1)" "w" "h!1"))
+     (GRIND))
+    NIL)
+   NIL SHOSTAK))
+ (|paired_timing_transfer| 0
+  (|paired_timing_transfer-1| NIL 3998836500 ("" (GRIND) NIL) NIL SHOSTAK)))
+

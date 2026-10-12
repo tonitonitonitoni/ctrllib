@@ -1,0 +1,9 @@
+.DS_Store
+.cache/
+lean-proof-env/
+**/.lake/
+**/__pycache__/
+**/.pytest_cache/
+20_tools/.extract/
+20_tools/generated/xylem/
+*.receipt.tmp

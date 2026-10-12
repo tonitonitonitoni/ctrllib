@@ -1,0 +1,32 @@
+metric_clearance[Point: TYPE]: THEORY
+BEGIN
+
+  d: VAR [Point, Point -> real]
+  p, q, p0, q0: VAR Point
+  ep, eq, delta: VAR real
+
+  delivered_clearance: THEOREM
+    FORALL (d: [Point, Point -> real], p, q, p0, q0: Point,
+            ep, eq, delta: real):
+      ep >= 0 AND eq >= 0 AND
+      d(p0, p) = d(p, p0) AND d(q0, q) = d(q, q0) AND
+      d(p0, q0) <= d(p0, p) + d(p, q0) AND
+      d(p, q0) <= d(p, q) + d(q, q0) AND
+      d(p, p0) <= ep AND d(q, q0) <= eq AND
+      delta <= d(p0, q0)
+      IMPLIES delta - ep - eq <= d(p, q)
+  %|- delivered_clearance : PROOF (then (skosimp*) (grind)) QED
+
+  motion_budget_clearance: THEOREM
+    FORALL (d: [Point, Point -> real], p, q, p0, q0: Point,
+            ep, eq, Lp, Lq, h, delta: real):
+      ep >= 0 AND eq >= 0 AND Lp >= 0 AND Lq >= 0 AND h >= 0 AND
+      d(p0, p) = d(p, p0) AND d(q0, q) = d(q, q0) AND
+      d(p0, q0) <= d(p0, p) + d(p, q0) AND
+      d(p, q0) <= d(p, q) + d(q, q0) AND
+      d(p, p0) <= ep + Lp*h AND d(q, q0) <= eq + Lq*h AND
+      delta <= d(p0, q0)
+      IMPLIES delta - ep - eq - (Lp + Lq)*h <= d(p, q)
+  %|- motion_budget_clearance : PROOF (then (skosimp*) (grind)) QED
+
+END metric_clearance

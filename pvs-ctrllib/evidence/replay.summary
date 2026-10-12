@@ -1,0 +1,28 @@
+PVS-Ctrllib acceptance scope — 19 September 2026
+Runtime: PVS 8.1 built with SBCL 2.6.8; proveit script banner 7.1.0
+External oracles: disabled. NASALib imports: none.
+
+Initial embedded ProofLite installation produced the saved .prf files.
+Final acceptance used the default scripts/replay.sh route: copies of the
+saved .pvs and .prf files in a fresh temporary context, --no-scripts,
+--disable-oracles and --force. No pre-existing .pvscontext or compiled theory
+cache was copied into the proof contexts.
+
+The checker compared expected theorem names, the exact formula/attempted/
+succeeded totals, and every proved-complete entry. Raw final per-theory
+summaries are retained in evidence/replay/.
+
+assume_guarantee: 2 formulas, 2 attempted, 2 succeeded, all complete
+two_rover_safety: 4 formulas, 4 attempted, 4 succeeded, all complete
+metric_clearance: 2 formulas, 2 attempted, 2 succeeded, all complete
+pose_clearance: 4 formulas, 4 attempted, 4 succeeded, all complete
+  pose_position_error, pose_body_clearance, clearance_budget_monotone,
+  clock_decomposition: proof-chain COMPLETE
+young_cross: 6 formulas, 6 attempted, 6 succeeded, all complete
+Total: 18 formulas, including one generated denominator TCC; all complete.
+
+Trust retained: PVS prelude logic/arithmetic, proof procedures, runtime and
+implementation. This is not an independent proof checker, cross-prover
+certificate transport, a Euclidean metric instantiation, or a physical
+rover/controller certificate. The earlier weighted NASALib closure of 136
+formulas is separate evidence and is excluded from this package's count.

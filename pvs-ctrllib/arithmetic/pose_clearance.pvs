@@ -1,0 +1,79 @@
+pose_clearance: THEORY
+BEGIN
+
+  x, theta, eps_pos, eps_rot, radius: VAR real
+
+  pose_position_error: THEOREM
+    eps_pos >= 0 AND eps_rot >= 0 AND radius >= 0 AND
+    abs(x) <= eps_pos AND abs(theta) <= eps_rot
+    IMPLIES abs(x) + radius * abs(theta) <= eps_pos + radius * eps_rot
+  %|- pose_position_error : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "le_plus_le")
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "radius!1" "y" "radius!1"
+  %|-       "nnz" "abs(theta!1)" "w" "eps_rot!1"))
+  %|-   (grind)) QED
+
+  p, q, p0, q0, delta: VAR real
+  tp, tq, rp, rq, erp, erq, Lp, Lq, h, cp, cq: VAR real
+
+  pose_body_clearance: THEOREM
+    tp >= 0 AND tq >= 0 AND rp >= 0 AND rq >= 0 AND
+    erp >= 0 AND erq >= 0 AND Lp >= 0 AND Lq >= 0 AND
+    h >= 0 AND cp >= 0 AND cq >= 0 AND
+    abs(p - p0) <= tp + rp*erp + Lp*h + cp AND
+    abs(q - q0) <= tq + rq*erq + Lq*h + cq AND
+    delta <= abs(p0 - q0)
+    IMPLIES delta - tp - tq - rp*erp - rq*erq - (Lp + Lq)*h - cp - cq
+      <= abs(p - q)
+  %|- pose_body_clearance : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "triangle"
+  %|-      ("x" "p0!1-p!1" "y" "p!1-q!1"))
+  %|-   (lemma "triangle"
+  %|-      ("x" "p0!1-p!1+p!1-q!1" "y" "q!1-q0!1"))
+  %|-   (grind)) QED
+
+  tp2, tq2, erp2, erq2, Lp2, Lq2, cp2, cq2: VAR real
+
+  clearance_budget_monotone: THEOREM
+    tp >= 0 AND tq >= 0 AND rp >= 0 AND rq >= 0 AND
+    erp >= 0 AND erq >= 0 AND Lp >= 0 AND Lq >= 0 AND
+    h >= 0 AND cp >= 0 AND cq >= 0 AND
+    tp <= tp2 AND tq <= tq2 AND erp <= erp2 AND erq <= erq2 AND
+    Lp <= Lp2 AND Lq <= Lq2 AND cp <= cp2 AND cq <= cq2
+    IMPLIES
+      delta - tp2 - tq2 - rp*erp2 - rq*erq2 - (Lp2 + Lq2)*h - cp2 - cq2
+      <= delta - tp - tq - rp*erp - rq*erq - (Lp + Lq)*h - cp - cq
+  %|- clearance_budget_monotone : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "rp!1" "y" "rp!1"
+  %|-       "nnz" "erp!1" "w" "erp2!1"))
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "rq!1" "y" "rq!1"
+  %|-       "nnz" "erq!1" "w" "erq2!1"))
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "h!1" "y" "h!1"
+  %|-       "nnz" "Lp!1" "w" "Lp2!1"))
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "h!1" "y" "h!1"
+  %|-       "nnz" "Lq!1" "w" "Lq2!1"))
+  %|-   (grind)) QED
+
+  actual_time, stamp_time, nominal_time, h_clock, h_stamp: VAR real
+
+  clock_decomposition: THEOREM
+    h_clock >= 0 AND h_stamp >= 0 AND
+    abs(actual_time - stamp_time) <= h_clock AND
+    abs(stamp_time - nominal_time) <= h_stamp
+    IMPLIES abs(actual_time - nominal_time) <= h_clock + h_stamp
+  %|- clock_decomposition : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "triangle"
+  %|-      ("x" "actual_time!1-stamp_time!1"
+  %|-       "y" "stamp_time!1-nominal_time!1"))
+  %|-   (grind)) QED
+
+END pose_clearance

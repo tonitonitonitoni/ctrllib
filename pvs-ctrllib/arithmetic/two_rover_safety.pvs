@@ -1,0 +1,51 @@
+two_rover_safety: THEORY
+BEGIN
+
+  p, q, p0, q0, ep, eq, delta: VAR real
+
+  absolute_error: LEMMA
+    ep >= 0 AND eq >= 0 AND abs(p - p0) <= ep AND abs(q - q0) <= eq
+    IMPLIES abs(p0 - q0) - ep - eq <= abs(p - q)
+  %|- absolute_error : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "triangle"
+  %|-      ("x" "p0!1-p!1" "y" "p!1-q!1"))
+  %|-   (lemma "triangle"
+  %|-      ("x" "p0!1-p!1+p!1-q!1" "y" "q!1-q0!1"))
+  %|-   (grind)) QED
+
+  clearance_transfer: THEOREM
+    ep >= 0 AND eq >= 0 AND abs(p - p0) <= ep AND abs(q - q0) <= eq AND
+    delta <= abs(p0 - q0)
+    IMPLIES delta - ep - eq <= abs(p - q)
+  %|- clearance_transfer : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "absolute_error")
+  %|-   (grind)) QED
+
+  Lp, Lq, h: VAR real
+
+  current_clearance: THEOREM
+    ep >= 0 AND eq >= 0 AND Lp >= 0 AND Lq >= 0 AND h >= 0 AND
+    abs(p - p0) <= ep + Lp*h AND abs(q - q0) <= eq + Lq*h AND
+    delta <= abs(p0 - q0)
+    IMPLIES delta - ep - eq - (Lp + Lq)*h <= abs(p - q)
+  %|- current_clearance : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "absolute_error"
+  %|-      ("ep" "ep!1+Lp!1*h!1" "eq" "eq!1+Lq!1*h!1"))
+  %|-   (grind)) QED
+
+  timing, L, eps: VAR real
+
+  timing_transfer: THEOREM
+    L >= 0 AND h >= 0 AND eps >= 0 AND abs(timing) <= h
+    IMPLIES eps + L * abs(timing) <= eps + L * h
+  %|- timing_transfer : PROOF
+  %|- (then (skosimp*)
+  %|-   (lemma "le_times_le_pos"
+  %|-      ("nnx" "L!1" "y" "L!1"
+  %|-       "nnz" "abs(timing!1)" "w" "h!1"))
+  %|-   (grind)) QED
+
+END two_rover_safety

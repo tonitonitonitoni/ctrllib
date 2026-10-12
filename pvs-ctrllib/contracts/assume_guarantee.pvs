@@ -1,0 +1,68 @@
+assume_guarantee[T, U, V, W: TYPE]: THEORY
+BEGIN
+
+  Relation[X, Y: TYPE]: TYPE = [X, Y -> bool]
+  Predicate[X: TYPE]: TYPE = [X -> bool]
+
+  satisfies?(R: Relation[T, U], A: Predicate[T], G: Relation[T, U]): bool =
+    FORALL (x: T, y: U): A(x) AND R(x, y) IMPLIES G(x, y)
+
+  satisfies_vw?(R: Relation[V, W], A: Predicate[V], G: Relation[V, W]): bool =
+    FORALL (x: V, y: W): A(x) AND R(x, y) IMPLIES G(x, y)
+
+  enabled?(R: Relation[T, U], A: Predicate[T]): bool =
+    FORALL (x: T): A(x) IMPLIES EXISTS (y: U): R(x, y)
+
+  enabled_vw?(R: Relation[V, W], A: Predicate[V]): bool =
+    FORALL (x: V): A(x) IMPLIES EXISTS (y: W): R(x, y)
+
+  compatible?(G: Relation[T, U], A: Predicate[V], wire: [U -> V]): bool =
+    FORALL (x: T, y: U): G(x, y) IMPLIES A(wire(y))
+
+  connected?(R: Relation[T, U], S: Relation[V, W], wire: [U -> V]): Relation[T, W] =
+    LAMBDA (x: T, z: W): EXISTS (y: U): R(x, y) AND S(wire(y), z)
+
+  sequential_assumption?(A1: Predicate[T], G1: Relation[T, U],
+                         A2: Predicate[V], wire: [U -> V]): Predicate[T] =
+    LAMBDA (x: T): A1(x) AND FORALL (y: U): G1(x, y) IMPLIES A2(wire(y))
+
+  sequential_guarantee?(G1: Relation[T, U], G2: Relation[V, W],
+                        wire: [U -> V]): Relation[T, W] =
+    LAMBDA (x: T, z: W): EXISTS (y: U): G1(x, y) AND G2(wire(y), z)
+
+  satisfies_sequential?(R: Relation[T, U], S: Relation[V, W],
+                        A1: Predicate[T], G1: Relation[T, U],
+                        A2: Predicate[V], G2: Relation[V, W],
+                        wire: [U -> V]): bool =
+    FORALL (x: T, z: W):
+      sequential_assumption?(A1, G1, A2, wire)(x) AND
+      connected?(R, S, wire)(x, z)
+      IMPLIES sequential_guarantee?(G1, G2, wire)(x, z)
+
+  enabled_sequential?(R: Relation[T, U], S: Relation[V, W],
+                      A1: Predicate[T], G1: Relation[T, U],
+                      A2: Predicate[V], G2: Relation[V, W],
+                      wire: [U -> V],
+                      seqA: Predicate[T]): bool =
+    FORALL (x: T): seqA(x) IMPLIES EXISTS (z: W):
+      connected?(R, S, wire)(x, z)
+
+  satisfies_sequential: LEMMA
+    FORALL (R: Relation[T, U], S: Relation[V, W],
+            A1: Predicate[T], G1: Relation[T, U],
+            A2: Predicate[V], G2: Relation[V, W], wire: [U -> V]):
+      satisfies?(R, A1, G1) AND satisfies_vw?(S, A2, G2)
+      IMPLIES satisfies_sequential?(R, S, A1, G1, A2, G2, wire)
+  %|- satisfies_sequential : PROOF (grind) QED
+
+  enabled_sequential: LEMMA
+    FORALL (R: Relation[T, U], S: Relation[V, W],
+            A1: Predicate[T], G1: Relation[T, U],
+            A2: Predicate[V], G2: Relation[V, W], wire: [U -> V]):
+      satisfies?(R, A1, G1) AND
+      enabled?(R, A1) AND enabled_vw?(S, A2)
+      IMPLIES enabled_sequential?(R, S, A1, G1, A2, G2, wire,
+        sequential_assumption?(A1, G1, A2, wire))
+  %|- enabled_sequential : PROOF (grind) QED
+
+END assume_guarantee
