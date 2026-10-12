@@ -20,5 +20,6 @@ jobs:
           lake-package-directory: ctrllib
       - uses: leanprover-community/docgen-action@dacc1acc2a3f532cc577266979ba9c36c7593f7c
         with:
+          api-docs: false
           deploy: false
           lake-package-directory: ctrllib
