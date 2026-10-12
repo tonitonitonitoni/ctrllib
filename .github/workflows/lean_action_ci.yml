@@ -18,8 +18,22 @@ jobs:
         with:
           build: true
           lake-package-directory: ctrllib
-      - uses: leanprover-community/docgen-action@dacc1acc2a3f532cc577266979ba9c36c7593f7c
+      - name: Check out pinned docgen build script
+        uses: actions/checkout@v5
         with:
-          api-docs: false
-          deploy: false
-          lake-package-directory: ctrllib
+          repository: leanprover-community/docgen-action
+          ref: dacc1acc2a3f532cc577266979ba9c36c7593f7c
+          path: .github/docgen-action
+          sparse-checkout: scripts/build_docs.sh
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Build API documentation
+        if: github.event_name == 'push'
+        working-directory: ctrllib
+        env:
+          NAME: Ctrllib
+          DOCS_FACETS: Ctrllib:docs
+          HOMEPAGE: docs
+          REFERENCES: references.bib
+        run: "$GITHUB_WORKSPACE/.github/docgen-action/scripts/build_docs.sh"
