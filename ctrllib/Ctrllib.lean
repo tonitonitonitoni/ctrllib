@@ -97,6 +97,7 @@ import Ctrllib.TrackingUltimateBound
 import Ctrllib.NominalMPC
 import Ctrllib.AssumeGuarantee
 import Ctrllib.ComControllerPlantComposition
+import Ctrllib.ComStartupRampComposition
 import Ctrllib.ReferenceAdmissibility
 import Ctrllib.TrackingForcingInterface
 import Ctrllib.InspectionMargin
