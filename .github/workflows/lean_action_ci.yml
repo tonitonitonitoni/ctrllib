@@ -28,6 +28,61 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
           persist-credentials: false
+      - name: Restore docgen build cache
+        id: docgen-cache-restore
+        if: github.event_name == 'push'
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: |
+            ctrllib/docbuild/.lake/build/doc/Mathlib
+            ctrllib/docbuild/.lake/build/doc/Cli
+            ctrllib/docbuild/.lake/build/doc/Archive
+            ctrllib/docbuild/.lake/build/doc/Counterexamples
+            ctrllib/docbuild/.lake/build/doc/Plausible
+            ctrllib/docbuild/.lake/build/doc/LeanSearchClient
+            ctrllib/docbuild/.lake/build/doc/ImportGraph
+            ctrllib/docbuild/.lake/build/doc/ProofWidgets
+            ctrllib/docbuild/.lake/build/doc/Aesop
+            ctrllib/docbuild/.lake/build/doc/Qq
+            ctrllib/docbuild/.lake/build/doc/Batteries
+            ctrllib/docbuild/.lake/build/doc/Init
+            ctrllib/docbuild/.lake/build/doc/Lake
+            ctrllib/docbuild/.lake/build/doc/Lean
+            ctrllib/docbuild/.lake/build/doc/Std
+            ctrllib/docbuild/.lake/build/doc-data
+            ctrllib/docbuild/.lake/build/doc/declarations/declaration-data.bmp
+            ctrllib/docbuild/.lake/build/api-docs.db
+            ctrllib/docbuild/.lake/build/doc-manifest.json
+            ctrllib/docbuild/.lake/build/doc/style.css
+            ctrllib/docbuild/.lake/build/doc/favicon.svg
+            ctrllib/docbuild/.lake/build/doc/declaration-data.js
+            ctrllib/docbuild/.lake/build/doc/color-scheme.js
+            ctrllib/docbuild/.lake/build/doc/nav.js
+            ctrllib/docbuild/.lake/build/doc/jump-src.js
+            ctrllib/docbuild/.lake/build/doc/expand-nav.js
+            ctrllib/docbuild/.lake/build/doc/how-about.js
+            ctrllib/docbuild/.lake/build/doc/search.js
+            ctrllib/docbuild/.lake/build/doc/mathjax-config.js
+            ctrllib/docbuild/.lake/build/doc/instances.js
+            ctrllib/docbuild/.lake/build/doc/importedBy.js
+            ctrllib/docbuild/.lake/build/doc/index.html
+            ctrllib/docbuild/.lake/build/doc/404.html
+            ctrllib/docbuild/.lake/build/doc/navbar.html
+            ctrllib/docbuild/.lake/build/doc/search.html
+            ctrllib/docbuild/.lake/build/doc/foundational_types.html
+            ctrllib/docbuild/.lake/build/doc/references.html
+            ctrllib/docbuild/.lake/build/doc/references.bib
+            ctrllib/docbuild/.lake/build/doc/tactics.html
+            ctrllib/docbuild/.lake/build/doc/find/index.html
+            ctrllib/docbuild/.lake/build/doc/find/find.js
+          key: docgen-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('ctrllib/lean-toolchain') }}-${{ hashFiles('ctrllib/lake-manifest.json') }}-${{ hashFiles('.github/docgen-action/scripts/build_docs.sh') }}-${{ github.sha }}
+          restore-keys: |
+            docgen-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('ctrllib/lean-toolchain') }}-${{ hashFiles('ctrllib/lake-manifest.json') }}-${{ hashFiles('.github/docgen-action/scripts/build_docs.sh') }}-
+      - name: Verify project docs are not restored
+        if: github.event_name == 'push'
+        working-directory: ctrllib
+        run: |
+          test ! -e docbuild/.lake/build/doc/Ctrllib
       - name: Build API documentation
         if: github.event_name == 'push'
         working-directory: ctrllib
@@ -37,3 +92,50 @@ jobs:
           HOMEPAGE: docs
           REFERENCES: references.bib
         run: "$GITHUB_WORKSPACE/.github/docgen-action/scripts/build_docs.sh"
+      - name: Save docgen build cache
+        if: ${{ github.event_name == 'push' && !cancelled() && steps.docgen-cache-restore.outputs.cache-hit != 'true' && success() }}
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: |
+            ctrllib/docbuild/.lake/build/doc/Mathlib
+            ctrllib/docbuild/.lake/build/doc/Cli
+            ctrllib/docbuild/.lake/build/doc/Archive
+            ctrllib/docbuild/.lake/build/doc/Counterexamples
+            ctrllib/docbuild/.lake/build/doc/Plausible
+            ctrllib/docbuild/.lake/build/doc/LeanSearchClient
+            ctrllib/docbuild/.lake/build/doc/ImportGraph
+            ctrllib/docbuild/.lake/build/doc/ProofWidgets
+            ctrllib/docbuild/.lake/build/doc/Aesop
+            ctrllib/docbuild/.lake/build/doc/Qq
+            ctrllib/docbuild/.lake/build/doc/Batteries
+            ctrllib/docbuild/.lake/build/doc/Init
+            ctrllib/docbuild/.lake/build/doc/Lake
+            ctrllib/docbuild/.lake/build/doc/Lean
+            ctrllib/docbuild/.lake/build/doc/Std
+            ctrllib/docbuild/.lake/build/doc-data
+            ctrllib/docbuild/.lake/build/doc/declarations/declaration-data.bmp
+            ctrllib/docbuild/.lake/build/api-docs.db
+            ctrllib/docbuild/.lake/build/doc-manifest.json
+            ctrllib/docbuild/.lake/build/doc/style.css
+            ctrllib/docbuild/.lake/build/doc/favicon.svg
+            ctrllib/docbuild/.lake/build/doc/declaration-data.js
+            ctrllib/docbuild/.lake/build/doc/color-scheme.js
+            ctrllib/docbuild/.lake/build/doc/nav.js
+            ctrllib/docbuild/.lake/build/doc/jump-src.js
+            ctrllib/docbuild/.lake/build/doc/expand-nav.js
+            ctrllib/docbuild/.lake/build/doc/how-about.js
+            ctrllib/docbuild/.lake/build/doc/search.js
+            ctrllib/docbuild/.lake/build/doc/mathjax-config.js
+            ctrllib/docbuild/.lake/build/doc/instances.js
+            ctrllib/docbuild/.lake/build/doc/importedBy.js
+            ctrllib/docbuild/.lake/build/doc/index.html
+            ctrllib/docbuild/.lake/build/doc/404.html
+            ctrllib/docbuild/.lake/build/doc/navbar.html
+            ctrllib/docbuild/.lake/build/doc/search.html
+            ctrllib/docbuild/.lake/build/doc/foundational_types.html
+            ctrllib/docbuild/.lake/build/doc/references.html
+            ctrllib/docbuild/.lake/build/doc/references.bib
+            ctrllib/docbuild/.lake/build/doc/tactics.html
+            ctrllib/docbuild/.lake/build/doc/find/index.html
+            ctrllib/docbuild/.lake/build/doc/find/find.js
+          key: docgen-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('ctrllib/lean-toolchain') }}-${{ hashFiles('ctrllib/lake-manifest.json') }}-${{ hashFiles('.github/docgen-action/scripts/build_docs.sh') }}-${{ github.sha }}
